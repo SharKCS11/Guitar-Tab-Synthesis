@@ -2,7 +2,10 @@
 [yA,Fs]=audioread('openA.wav');
 length = 4 % seconds
 nsamp = length*Fs;
-yA=yA(1:nsamp,:);
-yA_freq = fft(yA);
-om = linspace(1,Fs/2,nsamp);
-
+yB=yA(1:nsamp,1)+yA(1:nsamp,2);
+yB_freq = fftshift(fft(yB));
+om = linspace(-Fs/2,Fs/2,nsamp);
+plot(om,abs(yB_freq));
+xlabel('f');
+title('Frequency components of open A note');
+hfs = 2^(1/12); % multiply by this to get half-step

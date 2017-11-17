@@ -9,5 +9,10 @@ tsaudio = pvoc(yIn,1/shfactor);
 [N1,D1] = rat(1/shfactor); % approximate 1/shfactor to a rational number
 yOut = resample(tsaudio,N1,D1);
 
+% pitch shift may shorten file length: zero pad end of vector.
+if(length(yOut) < length(yIn))
+   yOut = padarray(yOut,[length(yIn)-length(yOut),0],'post');
+end
+
 end
 

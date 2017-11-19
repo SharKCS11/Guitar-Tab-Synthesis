@@ -1,4 +1,4 @@
-clear all;
+clear all; close all;
 filename = 'Training1.jpg';
 image = imread(filename);
 
@@ -35,14 +35,17 @@ summed_vert = (summed_vert >= 0.5 * max(summed_vert)) .* summed_vert;
 
 %Plot horizontal and vertical line locations
 figure(1)
-subplot(2, 1, 1); plot(summed_horz, 1:length(summed_horz))
-subplot(2, 1, 2); plot(summed_vert)
+%subplot(2, 1, 1); 
+plot(summed_horz)
+title('Horizontal Line Detection')
+xlabel('Vertical position of string lines in image')
+%subplot(2, 1, 2); plot(summed_vert)
 
 
 %Import pictures of numbers to serve as the ground truth for convolution
 true_0 = 1 - imbinarize(rgb2gray(imread('0.jpg')));
-% true_1 = imread('1.jpg');
-% true_2 = imread('2.jpg');
+true_1 = 1 - imbinarize(rgb2gray(imread('1.jpg')));
+true_2 = 1 - imbinarize(rgb2gray(imread('2.jpg')));
 % true_3 = imread('3.jpg');
 % true_4 = imread('4.jpg');
 % true_5 = imread('5.jpg');
@@ -54,36 +57,10 @@ true_0 = 1 - imbinarize(rgb2gray(imread('0.jpg')));
 %Get size of the true_0 image.
 [true0_rows, true0_cols] = size(true_0);
 
-%Declare matrices that store the value of the local convolution and
-%localized region
-%localized_region - the image around each string used for convolution. Same
-%height as test image, centered about a string location.
-localized_region = zeros(true0_rows, col_num, length(string_loc));
-local_conv = zeros(1, col_num - true0_cols - 1, length(string_loc));
-
-
-for i = 1:length(string_loc)
-    first_ind = string_loc(i) - floor(true0_rows / 2);
-    second_ind = string_loc(i) + ceil(true0_rows / 2) - 1;
-    %Create a region of same height as test image centered about each
-    %string location
-    localized_region(:, :, i) = image_binary(first_ind : second_ind, :);
-    
-    %Perform "convolution". Instead of flip and shift, just shift test
-    %image across the created localized_region and sum the product
-    for j = 1:col_num - true0_cols - 1
-        local_area = localized_region(:, j:j+true0_cols-1, i);
-        local_conv(1, j, i) = sum(sum(local_area .* true_0));
-    end
-    
-    %The convolution yields positive values for locations that are not 0s.
-    %Filter out these locations by only considereing locations that have
-    %convolution values larger than 0.75 the maximum value of the
-    %convolution. 0.75 is arbitrary, works well. 0.5 yielded some false
-    %positives.
-    max_conv_val = max(local_conv(:, :, i));
-    local_conv(:, :, i) = (local_conv(:, :, i) > 0.75 * max_conv_val);
-end
-
+%Call localized_dot_product to retrieve location of 0s for each localized
+%region
+[localized_region0, locations0] = localized_dot_product(image_binary, true_0, string_loc);
+[localized_region1, locations1] = localized_dot_product(image_binary, true_1, string_loc);
+[localized_region2, locations2] = localized_dot_product(image_binary, true_2, string_loc);
 
 

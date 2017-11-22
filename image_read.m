@@ -1,5 +1,5 @@
 clear all; close all;
-filename = 'Training1.jpg';
+filename = 'test_image0.jpg';
 image = imread(filename);
 
 %Create grayscale image
@@ -34,11 +34,11 @@ summed_vert = sum(image_edges, 1);
 summed_vert = (summed_vert >= 0.5 * max(summed_vert)) .* summed_vert;
 
 %Plot horizontal and vertical line locations
-figure(1)
+% figure(1)
 %subplot(2, 1, 1); 
-plot(summed_horz)
-title('Horizontal Line Detection')
-xlabel('Vertical position of string lines in image')
+% plot(summed_horz)
+% title('Horizontal Line Detection')
+% xlabel('Vertical position of string lines in image')
 %subplot(2, 1, 2); plot(summed_vert)
 
 
@@ -46,21 +46,45 @@ xlabel('Vertical position of string lines in image')
 true_0 = 1 - imbinarize(rgb2gray(imread('0.jpg')));
 true_1 = 1 - imbinarize(rgb2gray(imread('1.jpg')));
 true_2 = 1 - imbinarize(rgb2gray(imread('2.jpg')));
-% true_3 = imread('3.jpg');
-% true_4 = imread('4.jpg');
-% true_5 = imread('5.jpg');
-% true_6 = imread('6.jpg');
-% true_7 = imread('7.jpg');
-% true_8 = imread('8.jpg');
-% true_9 = imread('9.jpg');
+true_3 = 1 - imbinarize(rgb2gray(imread('3.jpg')));
+true_4 = 1 - imbinarize(rgb2gray(imread('4.jpg')));
+true_5 = 1 - imbinarize(rgb2gray(imread('5.jpg')));
+true_5 = true_5(3:end - 2, 3:end - 2);
+true_6 = 1 - imbinarize(rgb2gray(imread('6.jpg')));
+true_7 = 1 - imbinarize(rgb2gray(imread('7.jpg')));
+%true_8 = 1 - imbinarize(rgb2gray(imread('8.jpg')));
+
 
 %Get size of the true_0 image.
 [true0_rows, true0_cols] = size(true_0);
+[true1_rows, true1_cols] = size(true_1);
+[true2_rows, true2_cols] = size(true_2);
+[true3_rows, true3_cols] = size(true_3);
+% [true4_rows, true4_cols] = size(true_4);
+% [true5_rows, true5_cols] = size(true_5);
+% [true6_rows, true6_cols] = size(true_6);
+% [true7_rows, true7_cols] = size(true_7);
+%[true8_rows, true8_cols] = size(true_8);
 
 %Call localized_dot_product to retrieve location of 0s for each localized
 %region
 [localized_region0, locations0] = localized_dot_product(image_binary, true_0, string_loc);
 [localized_region1, locations1] = localized_dot_product(image_binary, true_1, string_loc);
 [localized_region2, locations2] = localized_dot_product(image_binary, true_2, string_loc);
+[localized_region3, locations3] = localized_dot_product(image_binary, true_3, string_loc);
+% [localized_region4, locations4] = localized_dot_product(image_binary, true_4, string_loc);
+% [localized_region5, locations5] = localized_dot_product(image_binary, true_5, string_loc);
+% [localized_region6, locations6] = localized_dot_product(image_binary, true_6, string_loc);
+% [localized_region7, locations7] = localized_dot_product(image_binary, true_7, string_loc);
+%[localized_region8, locations8] = localized_dot_product(image_binary, true_8, string_loc);
+
+
+locations = {locations0; locations1; locations2; locations3};
+feature_widths = [true0_cols, true1_cols, true2_cols, true3_cols];
+
+ordered_notes = find_note_order(locations, feature_widths);
+
+
+
 
 

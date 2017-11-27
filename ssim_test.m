@@ -1,5 +1,4 @@
 
-disp('Start');
 %{
 for(i=1:1:9)
     ref{i} = imread(sprintf('Reference_Images/%d.jpg',i-1));
@@ -8,12 +7,30 @@ for(i=1:1:9)
 end
 %}
 
-
+%{
 for(i=1:1:9)
     ref_rs{i} = imread(sprintf('Reference_Images/%d_rs.jpg',i-1));
 end
+%}
 
-
+disp('Reading resized images...');
+ref = cell(1,9);
+for(i=1:1:9)
+    ref{i} = 1 - imbinarize(rgb2gray(imread(sprintf('Reference_Images/%d_rs.jpg',i-1))));
+end
+figure(1);
+title('Structural similarity values for digits 0-8');
+horiz = 0:1:8;
+for(i=1:1:9)
+   simvals = zeros(1,9);
+   for(j=1:1:9)
+       simvals(j)=ssim(ref{i},ref{j});
+   end
+   subplot(3,3,i);
+   stem(horiz,simvals);
+   axis([0 8 0 1]);
+   xlabel(sprintf('ssim of %d',i-1));
+end
 
 %imresize
 function imOut = pc_resize(im,height,width)

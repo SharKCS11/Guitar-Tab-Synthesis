@@ -83,7 +83,9 @@ function ordered_notes = find_note_order(locations, feature_widths)
         %temp_ordered_notes at this point could contain note-location
         %conflicts. The following code corrects that by doing a direct
         %comparison with notes in the same horizontal location groupings.
-        temp_ordered_notes = sortrows(temp_ordered_notes, 1);
+        if(~isempty(temp_ordered_notes))
+            temp_ordered_notes = sortrows(temp_ordered_notes, 1);
+        end
         
         %Grab horizontal locations
         horz_locations = cell2mat(temp_ordered_notes(:, 1));
@@ -142,8 +144,18 @@ function ordered_notes = find_note_order(locations, feature_widths)
                 %dot product over this local horizontal position. 
                 for p = 1:length(string_inds)
                     feature_num = temp_ordered_notes{ctr + string_inds(p) - 1, 4} + 1;
-                    dot_out = locations{feature_num}(repeated_string, unique(horz_range));
-                    max_vals(p) = max(dot_out);
+                    
+                    %False-positives for features 1 and 3 are the most
+                    %common (feature_num is the index, so there is an
+                    %increase of 1). Thus, bias the the likelihood of a
+                    %number being a 1 or 3 by 0.9 (Arbitrary)
+                    if (feature_num == 4) || (feature_num == 2)
+                        dot_out = locations{feature_num}(repeated_string, (unique(horz_range) - 10: unique(horz_range) + 10));
+                        max_vals(p) = 0.95 * max(dot_out);
+                    else
+                        dot_out = locations{feature_num}(repeated_string, (unique(horz_range) - 10: unique(horz_range) + 10));
+                        max_vals(p) = max(dot_out);
+                    end
                 end
                 
                 %Want to keep the note with the highest dot product value.
@@ -182,7 +194,9 @@ function ordered_notes = find_note_order(locations, feature_widths)
         
         %Sort the notes first by 1.) horizontal location and 2.) string
         %location
-        temp_ordered_notes = sortrows(temp_ordered_notes, [1, 3]);
+        if(~isempty(temp_ordered_notes))
+            temp_ordered_notes = sortrows(temp_ordered_notes, [1, 3]);
+        end
         
         %Append this group of 6 strings to output
         ordered_notes{end + 1} = temp_ordered_notes;

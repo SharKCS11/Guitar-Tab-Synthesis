@@ -5,7 +5,7 @@
 %Outputs: localized_region, local_dot
 
 function [localized_region, local_dot] = localized_dot_product(image_binary, feature_binary, image_edges)
-    
+
     [row_num, col_num] = size(image_binary);
     
     %Find horizontal line locations for strings

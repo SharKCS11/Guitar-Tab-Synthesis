@@ -16,3 +16,16 @@ end
 
 end
 
+%{ 
+Pitch shifting code provided by D.P.W. Ellis of Columbia University
+This phase vocoder is an open-source implementation of the algorithm
+by Flanagan & Golden/Dolson
+@misc{Ellis02-pvoc
+  author = {D. P. W. Ellis},
+  year = {2002},
+  title = {A Phase Vocoder in {M}atlab},
+  note = {Web resource},
+  url = {http://www.ee.columbia.edu/~dpwe/resources/matlab/pvoc/},
+}
+%}
+

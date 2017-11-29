@@ -5,7 +5,7 @@ gts_init;
 
 %Get the filename from the user
 %filename = input('Guitar tab image name: ', 's');
-filename = 'Test Images/test_image2.JPG';
+filename = 'Test Images/test_image0.JPG';
 
 %Find the order of the notes on the image
 ordered_notes = image_read(filename);
@@ -14,7 +14,7 @@ ordered_notes = image_read(filename);
 notes_to_play = synthesize(ordered_notes);
 
 %*****PLAY AUDIO*****
-
+ Fsloc = Fs(1);
     %   need to fix - needs to be played much faster.
 for(j=1:1:length(notes_to_play))
     yA = notes_to_play{j};

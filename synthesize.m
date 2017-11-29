@@ -55,6 +55,8 @@ for(j=1:1:size(note_vals,1))
         fprintf('Note %d, %d encountered the first time. Generating.\n',strIdx,fretIdx-1);
         MNR(strIdx,fretIdx).used = true;
         MNR(strIdx,fretIdx).audio = pitch_shift(MNR(strIdx,1).audio,fretIdx-1);
+    else
+        fprintf('Getting cached note %d, %d\n',strIdx,fretIdx-1); 
     end
     if(length(soundOut)<1)
         soundOut = MNR(strIdx,fretIdx).audio;

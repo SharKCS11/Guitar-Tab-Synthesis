@@ -1,18 +1,23 @@
 %Initialize sound files
-%{
-Sample rates:
-E6 - 44100  A5 - 48000
-D4 - 44100  G3 - 44100
-B2 - 44100  E1 - 44100
-%}
+gts_init;
+
+
 
 %Get the filename from the user
-filename = input('Guitar tab image name: ', 's');
+%filename = input('Guitar tab image name: ', 's');
+filename = 'Test Images/test_image2.JPG';
 
 %Find the order of the notes on the image
 ordered_notes = image_read(filename);
-ordered_notes = ordered_notes{1};
 
 %*****SOUND SYNTHESIS*****
+notes_to_play = synthesize(ordered_notes);
 
 %*****PLAY AUDIO*****
+
+    %   need to fix - needs to be played much faster.
+for(j=1:1:length(notes_to_play))
+    yA = notes_to_play{j};
+    sound(yA(1:40000),Fsloc);
+    pause(1);
+end

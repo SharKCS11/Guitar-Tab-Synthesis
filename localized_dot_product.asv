@@ -13,23 +13,23 @@ function [localized_region, local_dot] = localized_dot_product(image_binary, fea
     %and finding the peaks should yield the locations of the horizontal
     %lines. 
     %Throw out noisy peaks to obtain only horizontal line locations
-%     summed_horz = sum(image_edges, 2);
-%     summed_horz = (summed_horz >= 0.5 * max(summed_horz)) .* summed_horz; 
-% 
-%     %Horizontal lines occur in peaks of 2. Reshape the matrix to represent
-%     %each line, then average the position of the peaks to get a singular
-%     %value for horizontal line location
-%     [horz_val, horz_line_loc] = findpeaks(summed_horz);
-%     horz_line_loc = reshape(horz_line_loc, 2, []);
-%     string_loc = floor(mean(horz_line_loc));
-    string_loc = find_horz_string_loc(image_edges);
-    
-%     %Find vertical line locations. Throw out noisy peaks by only
-%     %considering vertical lines that are greater than half the height of
-%     %the total image
-%     summed_vert = sum(image_edges, 1);
-%     summed_vert = (summed_vert >= 0.5 * row_num) .* summed_vert;
-%     vert_loc = find(summed_vert > 0);
+    summed_horz = sum(image_edges, 2);
+    summed_horz = (summed_horz >= 0.5 * max(summed_horz)) .* summed_horz; 
+
+    %Horizontal lines occur in peaks of 2. Reshape the matrix to represent
+    %each line, then average the position of the peaks to get a singular
+    %value for horizontal line location
+    [horz_val, horz_line_loc] = findpeaks(summed_horz);
+    horz_line_loc = reshape(horz_line_loc, 2, []);
+    string_loc = floor(mean(horz_line_loc));
+    string_loc2 = find_horz_string_loc(image_edges);
+
+    %Find vertical line locations. Throw out noisy peaks by only
+    %considering vertical lines that are greater than half the height of
+    %the total image
+    summed_vert = sum(image_edges, 1);
+    summed_vert = (summed_vert >= 0.5 * row_num) .* summed_vert;
+    vert_loc = find(summed_vert > 0);
 
     %Get size of feature size
     [feature_rows, feature_cols] = size(feature_binary);
@@ -47,13 +47,7 @@ function [localized_region, local_dot] = localized_dot_product(image_binary, fea
         
         %Create a region of same height as test image centered about each
         %string location
-        if(string_loc(i) < floor(feature_rows / 2))
-            localized_region(:, :, i) = image_binary(1:feature_rows + 4, :);
-        elseif(string_loc(i) > row_num - floor(feature_rows / 2))
-            localized_region(:, :, i) = image_binary(row_num - feature_rows - 3:row_num, :);
-        else
-            localized_region(:, :, i) = image_binary(first_ind : second_ind, :);
-        end
+        localized_region(:, :, i) = image_binary(first_ind : second_ind, :);
         
         %Perform "convolution". Instead of flip and shift, just shift test
         %image across the created localized_region and sum the product
@@ -79,7 +73,20 @@ function [localized_region, local_dot] = localized_dot_product(image_binary, fea
     
     %ONLY WORKS IF VERTICAL LINES ARE ALIGNED
     %Deletes localized area about the locations of the vertical lines.
-    local_dot = clear_vert_lines(image_edges, length(string_loc), local_dot, feature_rows);
+    temp = find_vert_loc(image_edges, length(string_loc));
+    temp
+
+    
+    if(~isempty(vert_loc))
+        for m = 1:length(vert_loc)
+            if (vert_loc(m) < feature_rows)
+                local_dot(:, 1:feature_rows) = 0;
+            else
+                vert_range = vert_loc(m) - floor(feature_rows) : vert_loc(m) + floor(feature_rows);
+                local_dot(:, vert_range) = 0;
+            end
+        end
+    end
 end
 
 function string_loc = find_horz_string_loc(image_edges)
@@ -91,39 +98,57 @@ function string_loc = find_horz_string_loc(image_edges)
     horz_inds = find(summed_horz > 0);
     string_loc = [];
     while(~isempty(horz_inds))
-        temp = horz_inds((horz_inds > horz_inds(1) - 5) & (horz_inds < horz_inds(1) + 5));
+        temp = horz_inds((horz_inds > horz_inds(1) - 0.1 .* row_num) & (horz_inds < horz_inds(1) + 0.1 .* row_num));
         string_loc = [string_loc, floor(mean(temp))];
         horz_inds = horz_inds(horz_inds > max(temp));
     end
 end
 
-function local_dot = clear_vert_lines(image_edges, num_strings, local_dot, feature_rows)
+function vert_loc = find_vert_loc(image_edges, num_strings)
     [row_num, col_num] = size(image_edges);
-    
+%     
+%     summed_vert = sum(image_edges, 1);
+%     summed_vert = (summed_vert >= 0.5 * row_num) .* summed_vert;
+%     vert_loc_temp = find(summed_vert > 0);
+%     vert_loc = zeros(1, length(vert_loc_temp));
+%     num_groups = num_strings / 6;
+%     
+%     if(~isempty(vert_loc_temp))
+%         for i = 1:length(vert_loc_temp)
+%             is_present_in_group = zeros(1, num_groups);
+%             for j = 1:num_groups
+%                 temp_range = ((((j - 1) * row_num) / num_groups) + 1) : (j * row_num / num_groups); 
+%                 image_region = image_edges(temp_range, vert_loc_temp(i) - 2:vert_loc_temp(i) + 2); 
+%                 if (sum(sum(image_region)) > 0.5 * length(temp_range))
+%                     is_present_in_group(j) = 1;
+%                 else
+%                     is_present_in_group(j) = 0;
+%                 end
+%             end
+%             temp = cell(1, 2);
+%             temp{1} = vert_loc_temp(i);
+%             temp{2} = is_present_in_group;
+%             vert_loc(i) = temp;
+%         end
+%     end
+%    
     num_groups = num_strings / 6;
     vert_loc = cell(1, num_groups);
     
     for i = 1:num_groups
         temp_range = ((((i - 1) * row_num) / num_groups) + 1) : (i * row_num / num_groups);
         image_region = image_edges(temp_range, :);
-        
         summed_vert = sum(image_region, 1);
+        %length(temp_range)
+        %summed_vert(summed_vert > 50)
+        %find(summed_vert > 50)
         summed_vert = (summed_vert > (0.33 * length(temp_range))) .* summed_vert;
-        
-        vert_inds = find(summed_vert > 0);
-        vert_loc = [];
-        while(~isempty(vert_inds))
-            temp = vert_inds((vert_inds > vert_inds(1) - 0.1 .* row_num) & (vert_inds < vert_inds(1) + 0.1 .* row_num));
-            vert_loc = [vert_loc, floor(mean(temp))];
-            vert_inds = vert_inds(vert_inds > max(temp));
+        vert_ind = find(summed_vert > 0);
+        vert_loc_temp
+        while(~isempty(vert_ind))
+            temp = horz_inds((horz_inds > horz_inds(1) - 0.1 .* row_num) & (horz_inds < horz_inds(1) + 0.1 .* row_num));
+
         end
-        for j = 1:length(vert_loc)
-            if (vert_loc(j) < feature_rows)
-                local_dot(:, 1:feature_rows) = 0;
-            else
-                vert_range = vert_loc(j) - floor(feature_rows) : vert_loc(j) + floor(feature_rows);
-                local_dot(:, vert_range) = 0;
-            end
-        end
+        vert_loc{i} = vert_loc_temp;
     end
 end

@@ -52,7 +52,7 @@ function ordered_notes = image_read(filename)
     %region
     locations=cell(num_images,1);
     feature_widths = true_cols;
-    for(i=0:1:num_images - 1)
+    for(i=0:1:8)
         fprintf('    Finding localized regions of %d\n',i);
         [localized_region,locations{i+1}] = localized_dot_product(image_binary, true{i+1}, image_edges);
     end

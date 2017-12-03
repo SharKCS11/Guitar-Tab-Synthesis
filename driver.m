@@ -20,5 +20,5 @@ notes_to_play = synthesize(ordered_notes);
 for(j=1:1:length(notes_to_play))
     yA = notes_to_play{j};
     sound(yA(1:40000),Fsloc);
-    pause(0.7);
+    pause(0.75);
 end

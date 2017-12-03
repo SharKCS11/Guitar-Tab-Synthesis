@@ -50,11 +50,14 @@ function ordered_notes = image_read(filename)
     
     %Call localized_dot_product to retrieve location of 0s for each localized
     %region
+    
+    string_loc = find_horz_string_loc(image_edges);
+
     locations=cell(num_images,1);
     feature_widths = true_cols;
     for(i=0:1:num_images - 1)
         fprintf('    Finding localized regions of %d\n',i);
-        [localized_region,locations{i+1}] = localized_dot_product(image_binary, true{i+1}, image_edges);
+        [localized_region,locations{i+1}] = localized_dot_product(image_binary, true{i+1}, image_edges, string_loc);
     end
     %{
     [localized_region0, locations0] = localized_dot_product(image_binary, true_0, image_edges);
@@ -76,5 +79,19 @@ function ordered_notes = image_read(filename)
 end
 
 
+function string_loc = find_horz_string_loc(image_edges)
+    [row_num, col_num] = size(image_edges);
+    
+    summed_horz = sum(image_edges, 2);
+    summed_horz = (summed_horz > 0.5 * max(summed_horz)) .* summed_horz;
+    
+    horz_inds = find(summed_horz > 0);
+    string_loc = [];
+    while(~isempty(horz_inds))
+        temp = horz_inds((horz_inds > horz_inds(1) - 5) & (horz_inds < horz_inds(1) + 5));
+        string_loc = [string_loc, floor(mean(temp))];
+        horz_inds = horz_inds(horz_inds > max(temp));
+    end
+end
 
 

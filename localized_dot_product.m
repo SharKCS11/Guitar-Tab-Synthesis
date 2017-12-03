@@ -4,7 +4,7 @@
 
 %Outputs: localized_region, local_dot
 
-function [localized_region, local_dot] = localized_dot_product(image_binary, feature_binary, image_edges)
+function [localized_region, local_dot] = localized_dot_product(image_binary, feature_binary, image_edges, string_loc)
 
     [row_num, col_num] = size(image_binary);
     
@@ -22,7 +22,6 @@ function [localized_region, local_dot] = localized_dot_product(image_binary, fea
 %     [horz_val, horz_line_loc] = findpeaks(summed_horz);
 %     horz_line_loc = reshape(horz_line_loc, 2, []);
 %     string_loc = floor(mean(horz_line_loc));
-    string_loc = find_horz_string_loc(image_edges);
     
 %     %Find vertical line locations. Throw out noisy peaks by only
 %     %considering vertical lines that are greater than half the height of
@@ -80,21 +79,6 @@ function [localized_region, local_dot] = localized_dot_product(image_binary, fea
     %ONLY WORKS IF VERTICAL LINES ARE ALIGNED
     %Deletes localized area about the locations of the vertical lines.
     local_dot = clear_vert_lines(image_edges, length(string_loc), local_dot, feature_rows);
-end
-
-function string_loc = find_horz_string_loc(image_edges)
-    [row_num, col_num] = size(image_edges);
-    
-    summed_horz = sum(image_edges, 2);
-    summed_horz = (summed_horz > 0.5 * max(summed_horz)) .* summed_horz;
-    
-    horz_inds = find(summed_horz > 0);
-    string_loc = [];
-    while(~isempty(horz_inds))
-        temp = horz_inds((horz_inds > horz_inds(1) - 5) & (horz_inds < horz_inds(1) + 5));
-        string_loc = [string_loc, floor(mean(temp))];
-        horz_inds = horz_inds(horz_inds > max(temp));
-    end
 end
 
 function local_dot = clear_vert_lines(image_edges, num_strings, local_dot, feature_rows)

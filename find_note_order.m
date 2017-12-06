@@ -1,34 +1,43 @@
-%Inputs: locations (cell array with location information across all
-%strings), feature_widths (vector with widths of all feature images)
-
-%Outputs: ordered_notes(cell array with length = # of string groups.
-%A string group is (total # of strings) / 6 <- 6 strings/group. Each
-%element in the cell array is a n x 4 cell array, where n is the total
-%number of notes found that that string group. 
-%    element(:, 1) = Horizontal locations column
-%    element(:, 2) = Note letter -> each string corresponds to a note
-%    element(:, 3) = String number. Strings numbering starts where string 1
-%                    is the top-most string. Indexing starts over with each
-%                    new group of strings. See below:
-%                    -------------- 1
-%                    -------------- 2
-%                    -------------- 3
-%                    -------------- 4
-%                    -------------- 5
-%                    -------------- 6
-%
-%                    -------------- 1
-%                    -------------- 2
-%                    -------------- 3
-%                    -------------- 4
-%                    -------------- 5
-%                    -------------- 6
-%    element(:, 4) = Fret number -> the number found on the guitar tab
-
 function ordered_notes = find_note_order(locations, feature_widths)
+%{
+FIND_NOTE_ORDER - Takes a cell array with location information for all
+reference images and vector of feature widths and returns ordered_notes.
+The format of ordered notes is found below
+
+Preconditions: localized_dot_product.m must be called and the outputs must 
+formatted appropriately before calling find_note_order 
+
+ordered_notes(cell array with length = # of string groups)
+
+A string group is (total # of strings) / 6 <- 6 strings/group. 
+
+Each element in the cell array is a n x 4 cell array, where n is the total
+number of notes found that that string group. 
+   element(:, 1) = Horizontal locations column
+   element(:, 2) = Note letter -> each string corresponds to a note
+   element(:, 3) = String number. Strings numbering starts where string 1
+                   is the top-most string. Indexing starts over with each
+                   new group of strings. See below:
+                   -------------- 1
+                   -------------- 2
+                   -------------- 3
+                   -------------- 4
+                   -------------- 5
+                   -------------- 6
+
+                   -------------- 1
+                   -------------- 2
+                   -------------- 3
+                   -------------- 4
+                   -------------- 5
+                   -------------- 6
+   element(:, 4) = Fret number -> the number found on the guitar tab
+
+%}
     ordered_notes = [];
     num_strings = size(locations{1}, 1);
-    
+
+    %Note letter dictionary
     notes = ['E', 'B', 'G', 'D', 'A', 'E'];
 
 %FIND NOTES FROM LOCATION INFORMATION

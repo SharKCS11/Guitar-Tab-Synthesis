@@ -1,1 +1,0 @@
-imA = imread('ironman.jpg');

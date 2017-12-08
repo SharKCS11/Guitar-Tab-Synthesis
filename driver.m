@@ -4,8 +4,8 @@ clear; close all;
 gts_init;
 
 %Get the filename from the user
-%filename = input('Guitar tab image name: ', 's');
-filename = 'Test Images/test_image10.JPG';
+filename = input('Guitar tab image name: ', 's');
+%filename = 'Test Images/test_image10.JPG';
 
 %Find the order of the notes on the image
 ordered_notes = image_read(filename);

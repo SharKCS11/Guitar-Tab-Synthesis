@@ -13,3 +13,5 @@ You can follow it to the "MATLAB code section to get the rest of our codebase no
 For example, if you want to run the program on Test Image 4, input the following when prompted:
 - On Windows: 'test_image4.jpg'
 - On Linux or Mac OS: 'test_image4.JPG' or 'Test Images/test_image4.JPG' 
+
+We have included 5 test files, numbered test_image1.JPG through test_image5.JPG. Images 1-4 are examples of correct output, while image 5 produces incorrect output. In-depth explanations can be found on our website under the "Implementation Overview" page.
